@@ -159,6 +159,8 @@ class MobileScannerHandler(
             "resetScale" -> resetScale(result)
             "updateScanWindow" -> updateScanWindow(call, result)
             "setFocus" -> setFocus(call, result)
+            "setFocusDistance" -> setFocusDistance(call, result)
+            "resetFocus" -> resetFocus(result)
             else -> result.notImplemented()
         }
     }
@@ -420,6 +422,55 @@ class MobileScannerHandler(
             result.error(
                 MobileScannerErrorCodes.GENERIC_ERROR,
                 "Cannot set focus when camera is stopped.",
+                null
+            )
+        } catch (e: Exception) {
+            result.error(
+                MobileScannerErrorCodes.GENERIC_ERROR,
+                MobileScannerErrorCodes.GENERIC_ERROR_MESSAGE,
+                e.localizedMessage
+            )
+        }
+    }
+
+    private fun setFocusDistance(call: MethodCall, result: MethodChannel.Result) {
+        val distance = call.argument<Double>("distance")?.toFloat()
+
+        if (distance == null || distance < 0f) {
+            result.error(
+                MobileScannerErrorCodes.INVALID_FOCUS_DISTANCE,
+                MobileScannerErrorCodes.INVALID_FOCUS_DISTANCE_MESSAGE,
+                null
+            )
+            return
+        }
+
+        try {
+            mobileScanner?.setFocusDistance(distance)
+            result.success(null)
+        } catch (e: ZoomWhenStopped) {
+            result.error(
+                MobileScannerErrorCodes.SET_FOCUS_DISTANCE_WHEN_STOPPED_ERROR,
+                MobileScannerErrorCodes.SET_FOCUS_DISTANCE_WHEN_STOPPED_ERROR_MESSAGE,
+                null
+            )
+        } catch (e: Exception) {
+            result.error(
+                MobileScannerErrorCodes.GENERIC_ERROR,
+                MobileScannerErrorCodes.GENERIC_ERROR_MESSAGE,
+                e.localizedMessage
+            )
+        }
+    }
+
+    private fun resetFocus(result: MethodChannel.Result) {
+        try {
+            mobileScanner?.resetFocus()
+            result.success(null)
+        } catch (e: ZoomWhenStopped) {
+            result.error(
+                MobileScannerErrorCodes.SET_FOCUS_DISTANCE_WHEN_STOPPED_ERROR,
+                MobileScannerErrorCodes.SET_FOCUS_DISTANCE_WHEN_STOPPED_ERROR_MESSAGE,
                 null
             )
         } catch (e: Exception) {

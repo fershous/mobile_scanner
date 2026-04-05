@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:mobile_scanner/src/mobile_scanner.dart' show MobileScanner;
 import 'package:mobile_scanner/src/mobile_scanner_controller.dart';
 
 /// This enum defines the different error codes for the mobile scanner.
@@ -43,125 +42,13 @@ enum MobileScannerErrorCode {
   controllerInitializing,
 
   /// The controller is not attached to any widget.
-  ///
-  /// This error occurs when [MobileScannerController.start] is called
-  /// but there is no active [MobileScanner] widget
-  /// for the [MobileScannerController] in the widget tree.
-  ///
-  /// To avoid this error, ensure that a [MobileScanner] widget
-  /// is attached to the widget tree
-  /// when [MobileScannerController.start] is called.
-  ///
-  /// BAD:
-  ///
-  /// ```dart
-  /// class ScannerExample extends StatefulWidget {
-  ///   const ScannerExample({super.key});
-  ///
-  ///   @override
-  ///   State<ScannerExample> createState() => _ScannerExampleState();
-  /// }
-  ///
-  /// class _ScannerExampleState extends State<ScannerExample> {
-  ///   final MobileScannerController controller = MobileScannerController();
-  ///
-  ///   bool _showScanner = false;
-  ///
-  ///   @override
-  ///   void initState() {
-  ///     super.initState();
-  ///     // The MobileScanner is only in the widget tree after the button is pressed.
-  ///     controller.start();
-  ///   }
-  ///
-  ///   @override
-  ///   Widget build(BuildContext context) {
-  ///     return Column(
-  ///       children: [
-  ///         ElevatedButton(
-  ///           onPressed: () {
-  ///             setState(() {
-  ///               _showScanner = true;
-  ///             });
-  ///           },
-  ///           child: const Text('Button'),
-  ///         ),
-  ///         if (_showScanner)
-  ///           Expanded(child: MobileScanner(controller: controller)),
-  ///       ],
-  ///     );
-  ///   }
-  /// }
-  /// ```
-  ///
-  /// GOOD:
-  ///
-  /// ```dart
-  /// class ScannerExample extends StatefulWidget {
-  ///   const ScannerExample({super.key});
-  ///
-  ///   @override
-  ///   State<ScannerExample> createState() => _ScannerExampleState();
-  /// }
-  ///
-  /// class _ScannerExampleState extends State<ScannerExample> {
-  ///   final MobileScannerController controller = MobileScannerController();
-  ///
-  ///   @override
-  ///   Widget build(BuildContext context) {
-  ///     return Column(
-  ///       children: [
-  ///         ElevatedButton(
-  ///           // The MobileScanner is already in the widget tree.
-  ///           onPressed: controller.start,
-  ///           child: const Text('Button'),
-  ///         ),
-  ///         Expanded(child: MobileScanner(controller: controller)),
-  ///       ],
-  ///     );
-  ///   }
-  /// }
-  /// ```
-  ///
-  /// GOOD:
-  ///
-  /// ```dart
-  /// class ScannerExample extends StatefulWidget {
-  ///   const ScannerExample({super.key});
-  ///
-  ///   @override
-  ///   State<ScannerExample> createState() => _ScannerExampleState();
-  /// }
-  ///
-  /// class _ScannerExampleState extends State<ScannerExample> {
-  ///   final MobileScannerController controller = MobileScannerController();
-  ///
-  ///   bool _showScanner = false;
-  ///
-  ///   void start() {
-  ///     if (_showScanner) return;
-  ///
-  ///     setState(() {
-  ///       _showScanner = true;
-  ///     });
-  ///
-  ///     // The MobileScanner will be in the widget tree in the next frame.
-  ///     controller.start();
-  ///   }
-  ///
-  ///   @override
-  ///   Widget build(BuildContext context) {
-  ///     return Column(
-  ///       children: [
-  ///         ElevatedButton(onPressed: start, child: const Text('Button')),
-  ///         if (_showScanner)
-  ///           Expanded(child: MobileScanner(controller: controller)),
-  ///       ],
-  ///     );
-  ///   }
-  /// }
-  /// ```
-  controllerNotAttached;
+  controllerNotAttached,
+
+  /// The focus distance is not valid.
+  invalidFocusDistance,
+
+  /// The focus distance was set while the camera was stopped.
+  setFocusDistanceWhenStopped;
 
   /// Convert the given [PlatformException.code] to a [MobileScannerErrorCode].
   factory MobileScannerErrorCode.fromPlatformException(
@@ -180,6 +67,10 @@ enum MobileScannerErrorCode {
       'MOBILE_SCANNER_NO_CAMERA_ERROR' => MobileScannerErrorCode.unsupported,
       'MOBILE_SCANNER_CAMERA_PERMISSION_DENIED' =>
         MobileScannerErrorCode.permissionDenied,
+      'MOBILE_SCANNER_INVALID_FOCUS_DISTANCE' =>
+        MobileScannerErrorCode.invalidFocusDistance,
+      'MOBILE_SCANNER_SET_FOCUS_DISTANCE_WHEN_STOPPED_ERROR' =>
+        MobileScannerErrorCode.setFocusDistanceWhenStopped,
       _ => MobileScannerErrorCode.genericError,
     };
   }
@@ -210,6 +101,10 @@ enum MobileScannerErrorCode {
         return 'The MobileScannerController has not been attached to '
             'MobileScanner. Call start() after the MobileScanner widget is '
             'built.';
+      case MobileScannerErrorCode.invalidFocusDistance:
+        return 'The focus distance is not valid.';
+      case MobileScannerErrorCode.setFocusDistanceWhenStopped:
+        return 'The focus distance cannot be set when the camera is stopped.';
     }
   }
 }

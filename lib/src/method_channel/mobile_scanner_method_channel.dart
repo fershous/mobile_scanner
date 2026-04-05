@@ -91,6 +91,14 @@ class MethodChannelMobileScanner extends MobileScannerPlatform {
   @visibleForTesting
   static const String kGetSupportedLensesMethodName = 'getSupportedLenses';
 
+  /// The name of the method that resets the focus mode.
+  @visibleForTesting
+  static const String kResetFocusMethodName = 'resetFocus';
+
+  /// The name of the method that sets the focus distance.
+  @visibleForTesting
+  static const String kSetFocusDistanceMethodName = 'setFocusDistance';
+
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel(
@@ -345,6 +353,26 @@ class MethodChannelMobileScanner extends MobileScannerPlatform {
     final params = <String, Object?>{'dx': position.dx, 'dy': position.dy};
 
     await methodChannel.invokeMethod<void>(kSetFocusMethodName, params);
+  }
+
+  @override
+  Future<void> resetFocus() async {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      throw UnimplementedError('resetFocus() has not been implemented.');
+    }
+
+    await methodChannel.invokeMethod<void>(kResetFocusMethodName);
+  }
+
+  @override
+  Future<void> setFocusDistance(double distance) async {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      throw UnimplementedError('setFocusDistance() has not been implemented.');
+    }
+
+    await methodChannel.invokeMethod<void>(kSetFocusDistanceMethodName, {
+      'distance': distance,
+    });
   }
 
   @override

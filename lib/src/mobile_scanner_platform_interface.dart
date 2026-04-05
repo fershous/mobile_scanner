@@ -92,6 +92,19 @@ abstract class MobileScannerPlatform extends PlatformInterface {
     throw UnimplementedError('setFocusPoint() has not been implemented.');
   }
 
+  /// Reset the focus mode to continuous auto focus.
+  Future<void> resetFocus() {
+    throw UnimplementedError('resetFocus() has not been implemented.');
+  }
+
+  /// Set the focus distance for the camera.
+  ///
+  /// The [distance] value is in diopters ($1/distance\_in\_meters$).
+  /// A value of `0.0` indicates that the camera is focused at infinity.
+  Future<void> setFocusDistance(double distance) {
+    throw UnimplementedError('setFocusDistance() has not been implemented.');
+  }
+
   /// Start the barcode scanner and prepare a scanner view.
   ///
   /// Upon calling this method, the necessary camera permission will be

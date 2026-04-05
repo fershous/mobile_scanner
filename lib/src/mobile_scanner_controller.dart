@@ -363,6 +363,35 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
     await MobileScannerPlatform.instance.setFocusPoint(clampedPosition);
   }
 
+  /// Reset the focus mode to continuous auto focus.
+  ///
+  /// Does nothing if the camera is not running.
+  Future<void> resetFocus() async {
+    _throwIfNotInitialized();
+
+    if (!value.isRunning) {
+      return;
+    }
+
+    await MobileScannerPlatform.instance.resetFocus();
+  }
+
+  /// Set the focus distance for the camera.
+  ///
+  /// The [distance] value is in diopters ($1/distance\_in\_meters$).
+  /// A value of `0.0` indicates that the camera is focused at infinity.
+  ///
+  /// Does nothing if the camera is not running.
+  Future<void> setFocusDistance(double distance) async {
+    _throwIfNotInitialized();
+
+    if (!value.isRunning) {
+      return;
+    }
+
+    await MobileScannerPlatform.instance.setFocusDistance(distance);
+  }
+
   /// Start scanning for barcodes.
   ///
   /// The [cameraDirection] can be used to specify the camera direction.

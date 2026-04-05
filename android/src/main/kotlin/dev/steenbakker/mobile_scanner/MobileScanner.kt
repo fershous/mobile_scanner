@@ -11,6 +11,9 @@ import android.util.Size
 import android.view.Surface
 import androidx.annotation.VisibleForTesting
 import androidx.camera.camera2.Camera2Config
+import androidx.camera.camera2.interop.Camera2CameraControl
+import androidx.camera.camera2.interop.CaptureRequestOptions
+import android.hardware.camera2.CaptureRequest
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
@@ -686,6 +689,40 @@ class MobileScanner(
             .build()
 
         cam.cameraControl.startFocusAndMetering(action)
+    }
+
+    /**
+     * Set the focus distance of the camera.
+     *
+     * The [distance] must be in diopters (1/distance_in_meters).
+     * 0.0f is infinity.
+     */
+    fun setFocusDistance(distance: Float) {
+        val cam = camera ?: throw ZoomWhenStopped()
+
+        val camera2Control = Camera2CameraControl.from(cam.cameraControl)
+
+        val captureRequestOptions = CaptureRequestOptions.Builder()
+            .setCaptureRequestOption(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF)
+            .setCaptureRequestOption(CaptureRequest.LENS_FOCUS_DISTANCE, distance)
+            .build()
+
+        camera2Control.captureRequestOptions = captureRequestOptions
+    }
+
+    /**
+     * Reset the focus mode to continuous auto focus.
+     */
+    fun resetFocus() {
+        val cam = camera ?: throw ZoomWhenStopped()
+
+        val camera2Control = Camera2CameraControl.from(cam.cameraControl)
+
+        val captureRequestOptions = CaptureRequestOptions.Builder()
+            .setCaptureRequestOption(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            .build()
+
+        camera2Control.captureRequestOptions = captureRequestOptions
     }
 
     /**
